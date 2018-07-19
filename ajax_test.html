@@ -2,6 +2,7 @@
 <html>
 <head>
   <title></title>
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.1.1/css/all.css" integrity="sha384-O8whS3fhG2OnA5Kas0Y9l3cfpmYjapjI0E4theH4iuMD+pLhbf6JI0jIMfYcK3yZ" crossorigin="anonymous">
   <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script> -->
   <script
   src="https://code.jquery.com/jquery-3.3.1.min.js"
@@ -34,13 +35,18 @@
       text-align: center;
       height: 30px;
     }
-    .remove-button{
-      float: right;
-      color: black;
+    #remove-button{
+      /*color: black;
       background-color: #e8e8e8;
       border-radius: 10px;
-      border-style: outset;
+      border-style: outset;*/
+      float: right;
+      margin-top: 6px;
+      font-size: 20px;
+    }
+    #edit-button{
       margin-top: 4px;
+      font-size: 20px;
     }
     table{
       float: left;
@@ -83,13 +89,12 @@
         success:function(apiData){
           console.log(apiData.length)
           for(i = 0; i < apiData.length; i++){
-            $("#table-body").append("<tr id="+apiData[i].id+"><td>"+apiData[i].name+"</td><td>"+apiData[i].age+"</td><td>"+apiData[i].designation+"</td><td><button class='remove-button'>X</button></td></tr>");
+            $("#table-body").append("<tr id="+apiData[i].id+"><td>"+apiData[i].name+"</td><td>"+apiData[i].age+"</td><td>"+apiData[i].designation+'</td><td><i id="edit-button" class="far fa-edit"></i><i id="remove-button" class="far fa-times-circle"></i></td></tr>');
           }
         },
         error: function(error){
           console.log(error)
         }
-
       })
 
 
@@ -107,7 +112,7 @@
             },
           success:function(apiData){
             console.log(apiData.id)
-            $("#table-body").append("<tr id="+apiData.id+"><td>"+apiData.name+"</td><td>"+apiData.age+"</td><td>"+apiData.designation+"</td><td><button class='remove-button'>X</button></td></tr>");
+            $("#table-body").append("<tr id="+apiData.id+"><td>"+apiData.name+"</td><td>"+apiData.age+"</td><td>"+apiData.designation+'</td><td><i id="edit-button" class="far fa-edit"></i><i id="remove-button" class="far fa-times-circle"></i></td></tr>');
           },
           error: function(error){
             console.log("r6ydtr")
@@ -122,7 +127,7 @@
 
 
 
-      $('#table-body').on('click','.remove-button',function(){
+      $('#table-body').on('click','#remove-button',function(){
         // console.log(this)
         uniqueId = $(this).closest("tr").attr("id");
 
