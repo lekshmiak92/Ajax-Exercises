@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title></title>
+  <!-- <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script> -->
+  <script
+  src="https://code.jquery.com/jquery-3.3.1.min.js"
+  integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+  crossorigin="anonymous"></script>
+
+  <style type="text/css">
+    #new_employee_form{
+      width: 25%;
+      margin: 0px;
+      float: left;
+      margin-left: 100px;
+    }
+    input {
+      float: right;
+    }
+
+    #addEmployee {
+      height: 40px;
+      background-color: #01b338;
+      border-radius: 10px;
+      border: 1px solid darkseagreen;
+      margin-left: 87px;
+      margin-top: 50px;
+      float: left;
+    }
+
+    td, th {
+      width: 180px;
+      text-align: center;
+      height: 30px;
+    }
+    .remove-button{
+      float: right;
+      color: black;
+      background-color: #e8e8e8;
+      border-radius: 10px;
+      border-style: outset;
+      margin-top: 4px;
+    }
+    table{
+      float: left;
+    }
+
+  </style>
+
+</head>
+<body>
+  <h2>Ajax test page</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Age</th>
+        <th>Designation</th>
+      </tr>
+    </thead>
+    <tbody id="table-body">      
+    </tbody>
+  </table>
+  <form id="new_employee_form">
+    <fieldset>
+      <legend><strong>Employee Details</strong></legend>
+      Employee Name:<input type="text" name="emp_name"><br><br>
+      Age:<input type="number" name="age"><br><br>
+      Designation:<input type="text" name="designation"><br>
+      <button id="addEmployee">Add New Employee</button>
+    </fieldset>
+  </form>    
+
+  <script type="text/javascript">
+    $(function() {
+
+      var uniqueId;
+
+      $.ajax({
+        url:"https://warm-plains-44796.herokuapp.com/employees",
+        type:"GET",
+        success:function(apiData){
+          console.log(apiData.length)
+          for(i = 0; i < apiData.length; i++){
+            $("#table-body").append("<tr id="+apiData[i].id+"><td>"+apiData[i].name+"</td><td>"+apiData[i].age+"</td><td>"+apiData[i].designation+"</td><td><button class='remove-button'>X</button></td></tr>");
+          }
+        },
+        error: function(error){
+          console.log(error)
+        }
+
+      })
+
+
+      $('#addEmployee').on("click", function(e){
+        e.preventDefault();
+        $.ajax({
+          url:"https://warm-plains-44796.herokuapp.com/employees",
+          type:"POST",
+          data:
+            {"employee":{
+              "name": $("form input[name='emp_name']").val() ,
+              "age":  $("form input[name='age']").val(),
+              "designation":$("form input[name='designation']").val()
+              }
+            },
+          success:function(apiData){
+            console.log(apiData.id)
+            $("#table-body").append("<tr id="+apiData.id+"><td>"+apiData.name+"</td><td>"+apiData.age+"</td><td>"+apiData.designation+"</td><td><button class='remove-button'>X</button></td></tr>");
+          },
+          error: function(error){
+            console.log("r6ydtr")
+          } 
+        })
+        resetForm();        
+      })
+
+      function resetForm(){
+         $(':input').val('');
+      }
+
+
+
+      $('#table-body').on('click','.remove-button',function(){
+        // console.log(this)
+        uniqueId = $(this).closest("tr").attr("id");
+
+        $.ajax({
+          url:"https://warm-plains-44796.herokuapp.com/employees/"+uniqueId,
+          type:"DELETE",
+          success:function(apiData){
+            $("#"+uniqueId).remove();
+          },
+          error: function(error){
+            console.log("not deleted")
+          }
+        })
+      })
+        
+      
+
+    });
+  </script>
+</body>
+</html>
