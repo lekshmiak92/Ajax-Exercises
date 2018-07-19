@@ -22,6 +22,7 @@
 
     #addEmployee {
       height: 40px;
+      width: 135px;
       background-color: #01b338;
       border-radius: 10px;
       border: 1px solid darkseagreen;
@@ -36,10 +37,6 @@
       height: 30px;
     }
     #remove-button{
-      /*color: black;
-      background-color: #e8e8e8;
-      border-radius: 10px;
-      border-style: outset;*/
       float: right;
       margin-top: 6px;
       font-size: 20px;
@@ -81,14 +78,14 @@
   <script type="text/javascript">
     $(function() {
 
-      var uniqueId;
+      var uniqueId=0;
+      var idToBeEdited=0;
 
       $.ajax({
         url:"https://warm-plains-44796.herokuapp.com/employees",
         type:"GET",
         success:function(apiData){
-          console.log(apiData.length)
-          for(i = 0; i < apiData.length; i++){
+           for(i = 0; i < apiData.length; i++){
             $("#table-body").append("<tr id="+apiData[i].id+"><td>"+apiData[i].name+"</td><td>"+apiData[i].age+"</td><td>"+apiData[i].designation+'</td><td><i id="edit-button" class="far fa-edit"></i><i id="remove-button" class="far fa-times-circle"></i></td></tr>');
           }
         },
@@ -100,6 +97,17 @@
 
       $('#addEmployee').on("click", function(e){
         e.preventDefault();
+        if ($("#addEmployee").hasClass('updateMode')) {
+          updateEmployeeDetails();
+        } 
+        else {
+          addNewEmployee();
+        }
+        resetForm();        
+      })
+
+
+      function addNewEmployee(){
         $.ajax({
           url:"https://warm-plains-44796.herokuapp.com/employees",
           type:"POST",
@@ -111,24 +119,43 @@
               }
             },
           success:function(apiData){
-            console.log(apiData.id)
             $("#table-body").append("<tr id="+apiData.id+"><td>"+apiData.name+"</td><td>"+apiData.age+"</td><td>"+apiData.designation+'</td><td><i id="edit-button" class="far fa-edit"></i><i id="remove-button" class="far fa-times-circle"></i></td></tr>');
           },
           error: function(error){
-            console.log("r6ydtr")
+            console.log("posting not done")
           } 
         })
-        resetForm();        
-      })
+      }
+      
 
       function resetForm(){
-         $(':input').val('');
+        $(':input').val('');
+        $("#addEmployee").html("Add New Employee");
+      }
+
+      function updateEmployeeDetails(){ 
+        $.ajax({
+          url:"https://warm-plains-44796.herokuapp.com/employees/"+idToBeEdited,
+          type:"PUT",
+          data:
+            {"employee":{
+              "name": $("form input[name='emp_name']").val() ,
+              "age":  $("form input[name='age']").val(),
+              "designation":$("form input[name='designation']").val()
+              }
+            },
+          success:function(apiData){
+            $("#"+idToBeEdited).html("<td>"+apiData.name+"</td><td>"+apiData.age+"</td><td>"+apiData.designation+'</td><td><i id="edit-button" class="far fa-edit"></i><i id="remove-button" class="far fa-times-circle"></i></td>');
+          },
+          error: function(error){
+            console.log("updation not done")
+          } 
+        }) 
       }
 
 
 
       $('#table-body').on('click','#remove-button',function(){
-        // console.log(this)
         uniqueId = $(this).closest("tr").attr("id");
 
         $.ajax({
@@ -139,6 +166,26 @@
           },
           error: function(error){
             console.log("not deleted")
+          }
+        })
+      })
+
+      $('#table-body').on('click','#edit-button',function(){
+        idToBeEdited = $(this).closest("tr").attr("id");
+        $("#addEmployee").html("Update");
+        $("#addEmployee").addClass("updateMode");
+        $.ajax({
+          url:"https://warm-plains-44796.herokuapp.com/employees/"+idToBeEdited,
+          type:"GET",
+
+          success:function(apiData){
+            $("form input[name='emp_name']").val(apiData.name)
+            $("form input[name='age']").val(apiData.age)
+            $("form input[name='designation']").val(apiData.designation)
+
+          },
+          error: function(error){
+            console.log("error")
           }
         })
       })
