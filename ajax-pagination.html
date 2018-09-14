@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Movies DB</title>
+	<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+	<style type="text/css">
+		body{
+			margin: 0px;
+		}
+		.header {
+	    background-color: #000056;
+	    height: 100px;
+			padding-top: 20px;
+		}
+		h2 {
+	    margin: auto;
+	    width: 250px;
+	    font-size: 40px;
+	    color: white;
+	    vertical-align: text-bottom;
+			padding-top: 20px;
+		}
+		.container {
+	    margin: 23px;
+    	float: left;
+		}
+		.item-wrap{
+			float: left;
+			background-color: #bdbdbd59;
+			width: 240px;
+	    height: 240px;
+	    margin: 5px;
+		}
+		.item-img{
+			width: 160px;
+	    height: 160px;
+	    margin: auto;
+	    margin-top: 10px;
+		}
+		.item-name{
+			background-color:#a5bcc7;
+			height: 50px;
+	    margin-top: 10px;
+	    overflow: auto;
+	    text-align: center;
+	    padding-top: 10px;
+		}
+		.footer {
+	    width: 100%;
+	    float: left;
+	    margin-bottom: 50px;
+		}
+		.pagination {
+	    width: 210px;
+	    margin: auto;
+	    overflow: hidden;
+		}
+		.page-nav{
+			width: 30px;
+	    height: 20px;
+	    margin: 5px;
+	    text-align: center;
+	    padding-top: 10px;
+	    float: left;
+		}
+		.page-no {
+	    background-color: powderblue;
+	    border: 1px solid midnightblue;
+	    border-radius: 10px;
+		}
+
+	</style>
+</head>
+<body>
+<div class="content-wrap">
+	<div class="header">
+		<h2> Movies DB </h2>	
+	</div>
+	<div class="container">
+	</div>
+	<div class="footer">
+		<div class="pagination">
+			
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	$(function() {
+		function showMovieList(apiData) {
+			for (var i = 0; i < apiData.result.length ; i++) {
+					$(".container").append('<div class="item-wrap"><div class="item-img"><img src="'+ apiData.result[i].thumbnail +'" height=160 width=160></div><div class="item-name">' + apiData.result[i].title + '</div></div>');
+			}
+
+		}
+
+		function fetchMovieList(pageNumber) {
+			var loadPage= pageNumber || "";
+			$.ajax({
+				url:"https://gorest.co.in/public-api/photos?_format=json&page=" + loadPage,
+				type:"GET", 
+				success:function(apiData){
+					showMovieList(apiData);
+					showPageNav(apiData,loadPage);
+				},
+				error:function(error){
+					console.log("error in Get")
+				}
+			});
+		}
+
+		function showPageNav(apiData,loadPage){
+			var currentPage = loadPage || 1;
+			var prevPage = currentPage-1;
+			var nextPage = Number(currentPage)+1;
+			var lastPage = apiData._meta["page-count"] ;
+			if (currentPage==lastPage) {
+				$(".pagination").append('<div class="page-nav page-no">1</div><div class="page-nav">...</div><div class="page-nav page-no">' +[prevPage-1]+ '</div><div class="page-nav page-no">'+prevPage+'</div><div class="page-nav page-no">'+currentPage+'</div>')
+			} 
+			else if (currentPage==1) {
+				$(".pagination").append('<div class="page-nav page-no">' +currentPage+ '</div><div class="page-nav page-no">'+nextPage +'</div><div class="page-nav page-no">'+ [nextPage+1] +'</div><div class="page-nav">...</div><div class="page-nav page-no">' +lastPage+ '</div>')
+			} 
+			else{
+				$(".pagination").append('<div class="page-nav page-no">' +prevPage+ '</div><div class="page-nav page-no">'+currentPage+'</div><div class="page-nav page-no">'+nextPage+'</div><div class="page-nav">...</div>		<div class="page-nav page-no">' +lastPage+ '</div>')
+			}
+		}
+
+		fetchMovieList();
+
+		$(".pagination").on("click",".page-no",function (){
+			var pageNumber = $(this).text();
+			$(".container").empty();
+			$(".pagination").empty();
+			fetchMovieList(pageNumber);
+
+		})
+
+	});
+</script>
+</body>
+</html>
