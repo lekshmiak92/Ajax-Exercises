@@ -86,7 +86,6 @@
 </div>
 
 <script type="text/javascript">
-	$(function() {
 		function showMovieList(apiData) {
 			for (var i = 0; i < apiData.result.length ; i++) {
 					$(".container").append('<div class="item-wrap"><div class="item-img"><img src="'+ apiData.result[i].thumbnail +'" height=160 width=160></div><div class="item-name">' + apiData.result[i].title + '</div></div>');
@@ -109,22 +108,35 @@
 			});
 		}
 
+		function showPageNo(page) {
+			for (var i = 0; i < page.length; i++) {
+				$(".pagination").append('<div class="page-nav page-no">' +page[i]+ '</div>') 
+			}
+		}
+		function showPagination(pageNosFormer,pageNosLatter) {
+			showPageNo(pageNosFormer);
+			$(".pagination").append('<div class="page-nav">...</div>');
+			showPageNo(pageNosLatter);
+		}
+
 		function showPageNav(apiData,loadPage){
-			var currentPage = loadPage || 1;
+			var firstPage = 1;
+			var currentPage = loadPage || firstPage;
 			var prevPage = currentPage-1;
 			var nextPage = Number(currentPage)+1;
 			var lastPage = apiData._meta["page-count"] ;
 			if (currentPage==lastPage) {
-				$(".pagination").append('<div class="page-nav page-no">1</div><div class="page-nav">...</div><div class="page-nav page-no">' +[prevPage-1]+ '</div><div class="page-nav page-no">'+prevPage+'</div><div class="page-nav page-no">'+currentPage+'</div>')
+				showPagination([firstPage],[[prevPage-1], prevPage, currentPage]);
 			} 
 			else if (currentPage==1) {
-				$(".pagination").append('<div class="page-nav page-no">' +currentPage+ '</div><div class="page-nav page-no">'+nextPage +'</div><div class="page-nav page-no">'+ [nextPage+1] +'</div><div class="page-nav">...</div><div class="page-nav page-no">' +lastPage+ '</div>')
+				showPagination([currentPage, nextPage, [nextPage+1]],[lastPage]);
 			} 
 			else{
-				$(".pagination").append('<div class="page-nav page-no">' +prevPage+ '</div><div class="page-nav page-no">'+currentPage+'</div><div class="page-nav page-no">'+nextPage+'</div><div class="page-nav">...</div>		<div class="page-nav page-no">' +lastPage+ '</div>')
+				showPagination([prevPage, currentPage, nextPage], [lastPage]);
 			}
 		}
 
+	$(function() {
 		fetchMovieList();
 
 		$(".pagination").on("click",".page-no",function (){
